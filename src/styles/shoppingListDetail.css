@@ -1,0 +1,296 @@
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+    background: #f2f5fb;
+}
+
+/* stránka – bílý obdélník přes šířku obsahu */
+
+.page {
+    min-height: 100vh;
+    padding: 32px 48px;
+    box-sizing: border-box;
+}
+
+/* „karta“ přes šířku – desktop */
+
+.card {
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.15);
+    padding: 20px 32px 32px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* horní řádek v kartě: název obrazovky + přepínač usera */
+
+.card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.breadcrumb {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* přepínač uživatelů uvnitř karty vpravo nahoře */
+
+.user-switcher {
+    padding: 6px 10px;
+    background: #0f172a;
+    color: white;
+    border-radius: 999px;
+    font-size: 13px;
+}
+
+.user-switcher select {
+    font-size: 13px;
+    border-radius: 999px;
+    border: none;
+    padding: 2px 6px;
+    margin-left: 4px;
+    outline: none;
+    background: white;
+    color: #0f172a;
+}
+
+/* Titulek + tužka */
+
+.title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px;
+}
+
+.list-title {
+    margin: 0;
+    font-size: 28px;
+}
+
+.title-input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    font-size: 18px;
+}
+
+/* Owner řádek */
+
+.owner-row {
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: #f8fafc;
+    margin-bottom: 10px;
+}
+
+.owner-label {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.members-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.member-pill {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: #e5f2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+}
+
+.member-pill.you {
+    background: #dbeafe;
+    border: 2px solid #2563eb;
+}
+
+/* +X more members jako malé tlačítko */
+
+.more-members-btn {
+    border-radius: 999px;
+    border: none;
+    background: #e5e7eb;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* Buttony / ikonky */
+
+.btn {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn.small {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.btn.add-btn {
+    background: #16a34a;
+    color: white;
+}
+
+.icon-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* Info o userovi */
+
+.current-user {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 8px 0 12px;
+}
+
+/* Drop-down členů pod owner boxem */
+
+.members-dropdown-body {
+    margin-top: 8px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    background: #f9fafb;
+}
+
+.members-dropdown-list {
+    list-style: none;
+    margin: 0 0 8px;
+    padding: 0;
+}
+
+.members-dropdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 14px;
+}
+
+.member-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.add-member-row {
+    display: flex;
+    gap: 8px;
+}
+
+.add-member-row input {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    font-size: 13px;
+}
+
+/* Přidání položky */
+
+.add-row {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0 12px;
+}
+
+.add-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+/* Filtr */
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+/* Položky */
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.item-pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+.item-main {
+    flex: 1;
+    text-align: left;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.item-pill.done .item-main {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.items-summary {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 8px 0 4px;
+}
+
+.item-info-btn {
+    font-size: 14px;
+}
+
+.item-details-panel {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.item-details-row {
+    margin: 2px 0;
+}
+
+.item-details-label {
+    font-weight: 600;
+}
