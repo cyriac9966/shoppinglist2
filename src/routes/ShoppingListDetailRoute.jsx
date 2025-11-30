@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/shoppingListDetail.css";
+import { useNavigate, useLocation } from "react-router-dom";
 
-// Výchozí data
-const INITIAL_SHOPPING_LIST = {
+
+const TEMPLATE_SHOPPING_LIST = {
     id: "list-1",
     name: "Red Wedding Feast",
     owner: {
@@ -92,35 +93,81 @@ const INITIAL_SHOPPING_LIST = {
     ],
 };
 
+
+const DETAIL_STORE = {}; // { [id: string]: ShoppingList }
+
 function ShoppingListDetailRoute() {
-    const [shoppingList, setShoppingList] = useState(INITIAL_SHOPPING_LIST);
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    // všichni "známí" uživatelé (v tomto úkolu jen initial members)
-    const [knownUsers] = useState(INITIAL_SHOPPING_LIST.members);
+    const listNameFromState = location.state?.listName;
+    const listIdFromState = location.state?.id || TEMPLATE_SHOPPING_LIST.id;
 
-    // aktuálně "přihlášený" uživatel – přepínáme v rohu karty
-    const [currentUserId, setCurrentUserId] = useState("u1"); // u1 = owner, u3 = člen...
+    const initialId = listIdFromState;
+    const initialName = listNameFromState || TEMPLATE_SHOPPING_LIST.name;
 
-    // název seznamu – editace
+    const isTemplateList = initialId === TEMPLATE_SHOPPING_LIST.id;
+
+
+    const knownUsers = TEMPLATE_SHOPPING_LIST.members;
+
+    const [shoppingList, setShoppingList] = useState(() => {
+        const stored = DETAIL_STORE[initialId];
+        if (stored) {
+            return stored;
+        }
+
+        if (isTemplateList) {
+            // hlavní ukázkový seznam
+            return {
+                ...TEMPLATE_SHOPPING_LIST,
+                id: initialId,
+                name: initialName,
+            };
+        }
+
+        // nový / jiný seznam – prázdný
+        return {
+            id: initialId,
+            name: initialName,
+            owner: {
+                id: "u1",
+                name: "Arya Stark",
+            },
+            members: [
+                {
+                    id: "u1",
+                    name: "Arya Stark",
+                    initials: "AS",
+                },
+            ],
+            items: [],
+        };
+    });
+
+    useEffect(() => {
+        DETAIL_STORE[shoppingList.id] = shoppingList;
+    }, [shoppingList]);
+
+    const [currentUserId, setCurrentUserId] = useState("u1");
     const [isEditingTitle, setIsEditingTitle] = useState(false);
-    const [editTitle, setEditTitle] = useState(INITIAL_SHOPPING_LIST.name);
+    const [editTitle, setEditTitle] = useState(initialName);
 
-    // položky
     const [newItemName, setNewItemName] = useState("");
     const [showOnlyUndone, setShowOnlyUndone] = useState(false);
 
-    // členové – dropdown
     const [membersOpen, setMembersOpen] = useState(false);
     const [newMemberName, setNewMemberName] = useState("");
 
-    // detail položky
     const [selectedItemId, setSelectedItemId] = useState(null);
 
-    const currentUser = knownUsers.find((u) => u.id === currentUserId) || null;
+    const currentUser =
+        knownUsers.find((u) => u.id === currentUserId) || null;
 
-    // role vůči aktuálnímu seznamu
     const isOwner = shoppingList.owner.id === currentUserId;
-    const isMember = shoppingList.members.some((m) => m.id === currentUserId);
+    const isMember = shoppingList.members.some(
+        (m) => m.id === currentUserId
+    );
     const isFormerMember = !!currentUser && !isMember && !isOwner;
 
     const getUserNameById = (id) =>
@@ -146,16 +193,16 @@ function ShoppingListDetailRoute() {
     const activeCount = totalCount - doneCount;
 
     const selectedItem =
-        shoppingList.items.find((item) => item.id === selectedItemId) || null;
+        shoppingList.items.find((item) => item.id === selectedItemId) ||
+        null;
 
     const handleToggleItem = (itemId) => {
-        if (!isMember) return; // pouze člen (včetně ownera)
+        if (!isMember) return;
         setShoppingList((prev) => ({
             ...prev,
             items: prev.items.map((item) => {
                 if (item.id !== itemId) return item;
 
-                // přepínání done + metadata
                 if (!item.done) {
                     return {
                         ...item,
@@ -206,7 +253,6 @@ function ShoppingListDetailRoute() {
             items: prev.items.filter((item) => item.id !== itemId),
         }));
 
-        // když smažu item, který je zrovna vybraný v detailu, detail zavřu
         if (selectedItemId === itemId) {
             setSelectedItemId(null);
         }
@@ -245,7 +291,6 @@ function ShoppingListDetailRoute() {
         const trimmed = newMemberName.trim();
         if (!trimmed) return;
 
-        // hledání uživatele podle jména
         const existingUser = knownUsers.find((u) => u.name === trimmed);
 
         if (!existingUser) {
@@ -253,7 +298,6 @@ function ShoppingListDetailRoute() {
             return;
         }
 
-        // pokud už je členem
         const alreadyMember = shoppingList.members.some(
             (m) => m.id === existingUser.id
         );
@@ -298,7 +342,7 @@ function ShoppingListDetailRoute() {
         }));
     };
 
-    //  USER SWITCHER
+    // USER SWITCHER
 
     const handleUserChange = (e) => {
         setCurrentUserId(e.target.value);
@@ -310,10 +354,35 @@ function ShoppingListDetailRoute() {
         setSelectedItemId((prev) => (prev === itemId ? null : itemId));
     };
 
+    const handleBack = () => {
+        const updatedList = {
+            id: shoppingList.id,
+            name: shoppingList.name,
+            itemCount: shoppingList.items.length,
+            memberCount: shoppingList.members.length,
+        };
+
+        navigate("/", { state: { updatedList } });
+    };
+
     return (
         <div className="page">
             <div className="card">
                 <div className="card-top-row">
+                    <div>
+                        <button
+                            type="button"
+                            className="btn small"
+                            onClick={handleBack}
+                            style={{ marginBottom: 6 }}
+                        >
+                            ← Zpět na přehled
+                        </button>
+                        <div className="breadcrumb">
+                            Nákupní seznamy / Detail seznamu
+                        </div>
+                    </div>
+
                     <div className="user-switcher">
                         <label>
                             User:&nbsp;
@@ -328,7 +397,7 @@ function ShoppingListDetailRoute() {
                     </div>
                 </div>
 
-                {/* Název seznamu – tužka jen pro owner */}
+                {/* Název seznamu */}
                 <div className="title-row">
                     {isEditingTitle && isOwner ? (
                         <>
@@ -372,7 +441,7 @@ function ShoppingListDetailRoute() {
                     )}
                 </div>
 
-                {/* Owner + bubliny členů */}
+                {/* Owner +  členové */}
                 <div className="owner-row">
                     <div>
                         <div className="owner-label">
@@ -402,7 +471,7 @@ function ShoppingListDetailRoute() {
                     </div>
                 </div>
 
-                {/* Dropdown s členy  */}
+                {/* Dropdown se členy */}
                 {membersOpen && (
                     <div className="members-dropdown-body">
                         <ul className="members-dropdown-list">
@@ -418,7 +487,6 @@ function ShoppingListDetailRoute() {
                         {isThisUser && " (you)"}
                     </span>
                                         <div className="member-actions">
-                                            {/* běžný člen moznost odchodu */}
                                             {isMember &&
                                                 !isOwner &&
                                                 isThisUser &&
@@ -432,7 +500,6 @@ function ShoppingListDetailRoute() {
                                                     </button>
                                                 )}
 
-                                            {/* owner – možnost mazat */}
                                             {isOwner && !isThisOwner && (
                                                 <button
                                                     type="button"
@@ -449,7 +516,6 @@ function ShoppingListDetailRoute() {
                             })}
                         </ul>
 
-                        {/* Přidání člena – jen owner, jen pokud jméno existuje v knownUsers */}
                         {isOwner && (
                             <form className="add-member-row" onSubmit={handleAddMember}>
                                 <input
@@ -466,7 +532,7 @@ function ShoppingListDetailRoute() {
                     </div>
                 )}
 
-                {/* Info o přihlášeném + režim */}
+                {/* Info o přihlášeném */}
                 <p className="current-user">
                     You are:{" "}
                     <strong>{currentUser ? currentUser.name : "Unknown"}</strong>
@@ -476,7 +542,7 @@ function ShoppingListDetailRoute() {
                         " (not a member of this list anymore – read only)"}
                 </p>
 
-                {/* Leave list – pro člena, který není owner */}
+                {/* Leave list */}
                 {isMember && !isOwner && (
                     <button
                         type="button"
@@ -527,7 +593,7 @@ function ShoppingListDetailRoute() {
                     <strong>{doneCount}</strong>
                 </div>
 
-                {/* Položky – klik i koš fungují jen, pokud je user člen */}
+                {/* Položky */}
                 <div className="items-grid">
                     {visibleItems.map((item) => (
                         <div
@@ -544,7 +610,6 @@ function ShoppingListDetailRoute() {
                                 {item.name}
                             </button>
 
-                            {/* info o položce – vždy dostupné */}
                             <button
                                 type="button"
                                 className="icon-btn item-info-btn"
@@ -577,8 +642,7 @@ function ShoppingListDetailRoute() {
                         </div>
                         <div className="item-details-row">
                             <span className="item-details-label">Created:</span>{" "}
-                            {formatDateTime(selectedItem.createdAt)}{" "}
-                            by{" "}
+                            {formatDateTime(selectedItem.createdAt)} by{" "}
                             {selectedItem.createdById
                                 ? getUserNameById(selectedItem.createdById)
                                 : "Unknown"}
@@ -587,8 +651,7 @@ function ShoppingListDetailRoute() {
                             <span className="item-details-label">Status:</span>{" "}
                             {selectedItem.done ? (
                                 <>
-                                    Completed on{" "}
-                                    {formatDateTime(selectedItem.completedAt)} by{" "}
+                                    Completed on {formatDateTime(selectedItem.completedAt)} by{" "}
                                     {selectedItem.completedById
                                         ? getUserNameById(selectedItem.completedById)
                                         : "Unknown"}
